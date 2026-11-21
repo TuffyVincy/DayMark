@@ -1,0 +1,235 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "Private user account profile for Daymark habit tracking.",
+      "type": "object",
+      "properties": {
+        "uid": {
+          "type": "string",
+          "description": "Firebase Auth UID matching the document ID.",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "displayName": {
+          "type": "string",
+          "description": "Display name shown in greeting and profile.",
+          "minLength": 1,
+          "maxLength": 80
+        },
+        "email": {
+          "type": "string",
+          "format": "email",
+          "description": "Verified account email address (owner-only).",
+          "maxLength": 160
+        },
+        "photoURL": {
+          "type": "string",
+          "description": "Optional avatar URL from auth provider.",
+          "maxLength": 500
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp of profile creation."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp of last profile update."
+        }
+      },
+      "required": ["uid", "displayName", "email", "photoURL", "createdAt", "updatedAt"]
+    },
+    "Habit": {
+      "title": "Habit",
+      "description": "A daily check-off or numeric-target habit goal owned by a user.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Habit document identifier.",
+          "minLength": 1,
+          "maxLength": 64,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "userId": {
+          "type": "string",
+          "description": "Owner Firebase Auth UID.",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "title": {
+          "type": "string",
+          "description": "Human-readable habit goal title.",
+          "minLength": 1,
+          "maxLength": 80
+        },
+        "category": {
+          "type": "string",
+          "enum": ["wellness", "focus", "fitness", "learning"],
+          "description": "Habit category."
+        },
+        "icon": {
+          "type": "string",
+          "enum": [
+            "droplets",
+            "heart",
+            "brain",
+            "dumbbell",
+            "footprints",
+            "book",
+            "moon",
+            "sun",
+            "apple",
+            "flame",
+            "music",
+            "pencil"
+          ],
+          "description": "Optional visual icon identifier for the habit."
+        },
+        "timeOfDay": {
+          "type": "string",
+          "enum": ["morning", "afternoon", "evening", "anytime"],
+          "description": "Preferred time-of-day slot."
+        },
+        "trackingType": {
+          "type": "string",
+          "enum": ["boolean", "numeric"],
+          "description": "Check-off boolean or quantitative numeric target."
+        },
+        "targetValue": {
+          "type": "number",
+          "description": "Daily numeric goal target (1 for boolean habits, 1..100000 for numeric)."
+        },
+        "unit": {
+          "type": "string",
+          "description": "Unit label for numeric targets (e.g. glasses, mins, pages).",
+          "maxLength": 24
+        },
+        "scheduleDays": {
+          "type": "array",
+          "description": "Bounded array of weekday indices (0=Sun..6=Sat) when habit is active."
+        },
+        "reminderTime": {
+          "type": "string",
+          "description": "Optional daily reminder time in 24-hour HH:MM format, or empty string when unset.",
+          "maxLength": 5,
+          "pattern": "^(|([01][0-9]|2[0-3]):[0-5][0-9])$"
+        },
+        "archived": {
+          "type": "boolean",
+          "description": "Whether the habit is archived from daily check-ins."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp of habit creation."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp of last habit update."
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "title",
+        "category",
+        "timeOfDay",
+        "trackingType",
+        "targetValue",
+        "unit",
+        "scheduleDays",
+        "archived",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "HabitLog": {
+      "title": "HabitLog",
+      "description": "Deterministic daily progress entry for a specific habit and YYYY-MM-DD date.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Composite log identifier formatted as habitId_YYYY-MM-DD.",
+          "minLength": 12,
+          "maxLength": 80,
+          "pattern": "^[a-zA-Z0-9_\\-]+_[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+        },
+        "userId": {
+          "type": "string",
+          "description": "Owner Firebase Auth UID.",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "habitId": {
+          "type": "string",
+          "description": "Parent habit identifier.",
+          "minLength": 1,
+          "maxLength": 64,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "dateKey": {
+          "type": "string",
+          "description": "Calendar day key in YYYY-MM-DD format.",
+          "minLength": 10,
+          "maxLength": 10,
+          "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+        },
+        "value": {
+          "type": "number",
+          "description": "Logged value for the day (0 or 1 for boolean; 0..1000000 for numeric)."
+        },
+        "targetSnapshot": {
+          "type": "number",
+          "description": "Target value snapshot at time of logging."
+        },
+        "completed": {
+          "type": "boolean",
+          "description": "Whether the daily goal was reached on dateKey."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp of last log update."
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "habitId",
+        "dateKey",
+        "value",
+        "targetSnapshot",
+        "completed",
+        "updatedAt"
+      ]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": {
+        "$ref": "#/entities/UserProfile"
+      },
+      "description": "Owner-only user profile documents."
+    },
+    "/users/{userId}/habits/{habitId}": {
+      "schema": {
+        "$ref": "#/entities/Habit"
+      },
+      "description": "Habits defined by the authenticated user."
+    },
+    "/users/{userId}/logs/{logId}": {
+      "schema": {
+        "$ref": "#/entities/HabitLog"
+      },
+      "description": "Daily check-in and numeric target progress records."
+    }
+  }
+}

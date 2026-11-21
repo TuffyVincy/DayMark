@@ -1,0 +1,8 @@
+{
+  "name": "Daymark",
+  "description": "Cloud-synced daily habit and goal tracker with check-offs, numeric targets, and streak tracking.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
